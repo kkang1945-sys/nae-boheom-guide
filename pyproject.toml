@@ -32,3 +32,6 @@ pythonpath = ["src"]
 [tool.coverage.run]
 branch = true
 source = ["insurance_app"]
+
+[tool.setuptools.package-data]
+insurance_app = ["templates/*.html"]
