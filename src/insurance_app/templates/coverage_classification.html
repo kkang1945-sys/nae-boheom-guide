@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>담보 종류별 보기</title>
+<style>body{font-family:system-ui,sans-serif;background:#f4f7fb;color:#172033;margin:0}main{max-width:1000px;margin:auto;padding:28px 16px}header,section{background:white;border-radius:16px;padding:24px;margin-bottom:20px}a{color:#175cd3}p{line-height:1.7}li{padding:12px 0;border-bottom:1px solid #ddd}small{display:block;color:#5b6576}ul{padding-left:20px}</style>{% include '_theme.html' %}</head>
+<body><main><a href="/documents/{{ document.id }}/summary">← 담보 표 요약</a>
+<header><h1>담보 종류별 보기</h1><p>{{ document.source_name|mask_document_name }} · {{ count }}개 담보</p>
+<p>담보 이름을 바탕으로 15개 종류에 나눈 분류 후보입니다. 같은 종류라도 보장 범위와 지급 조건이 같다는 뜻은 아닙니다. 금액 합산과 보험금 지급 판단은 하지 않았습니다.</p>
+<p>‘표준군 밖’은 자동차·법률·골절처럼 이 화면의 15개 기준에 넣지 않은 담보입니다. 보장이 없거나 잘못 읽혔다는 뜻이 아닙니다. 여러 보장이 섞였거나 이름만으로 범위를 정할 수 없는 항목만 ‘분류 확인 필요’에 남깁니다.</p>
+<a href="/documents/{{ document.id }}/conditions">지급 조건과 원문 근거 확인</a></header>
+<p><a href="/documents/{{ document.id }}/integration">담보 통합 준비 현황 보기 →</a></p>
+<p><a href="/documents/{{ document.id }}/explanations">담보 쉬운 설명 보기 →</a></p>
+{% for group in groups %}<section><h2>{{ group.name }} · {{ group.rows|length }}개</h2><ul>
+{% for row in group.rows %}<li>{{ row.effective_name|mask_pii }}{% if row.name_changed %}<small>사용자 수정 이름 적용 · 원문명: {{ row.original_name|mask_pii }}</small>{% endif %}
+<small><a href="/documents/{{ document.id }}/pages/{{ row.page_number }}?coverage_id={{ row.id }}">원문 {{ row.page_number }}쪽 {{ row.row_number }}행</a> · <a href="/documents/{{ document.id }}#pdf-coverage-{{ row.id }}">수정·이력 보기</a></small></li>{% endfor %}
+</ul></section>{% endfor %}<small>분류 규칙: {{ version }}</small></main></body></html>
+

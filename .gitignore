@@ -1,0 +1,19 @@
+# 실제 보험 원본 및 내보내기
+*.pdf
+*.hwp
+*.hwpx
+data/
+exports/
+submission/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+# 로컬 설정
+.env
+*.db
+*.sqlite3

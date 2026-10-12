@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <style>
+      :root { font-family: system-ui, sans-serif; color: #172033; }
+      body { margin: 0; background: #f4f7fb; }
+      main { max-width: 760px; margin: auto; padding: 56px 24px; }
+      article { padding: 32px; background: white; border-radius: 18px; box-shadow: 0 10px 30px #18284a10; }
+      .step { color: #175cd3; font-weight: 800; }
+      .locked { padding: 15px; border-radius: 10px; background: #fff4d6; color: #704d00; }
+      p { line-height: 1.75; }
+      a.button { display: inline-block; margin-top: 14px; padding: 12px 18px; border-radius: 10px; background: #175cd3; color: white; text-decoration: none; font-weight: 700; }
+    </style>
+  {% include '_theme.html' %}</head>
+  <body>
+    <main>
+      <article>
+        <p class="step">{{ step }}</p>
+        <h1>{{ title }}</h1>
+        <p>{{ body }}</p>
+        {% if locked %}<p class="locked">아직 구현되지 않은 기능입니다. 계산이나 판단이 완료된 것처럼 표시하지 않습니다.</p>{% endif %}
+        <a class="button" href="{{ next_url }}">{{ next_label }}</a>
+      </article>
+    </main>
+  </body>
+</html>

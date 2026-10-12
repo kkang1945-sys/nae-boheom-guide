@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "purpose": "보험 문서 추출·분류 규칙의 내부 평가용 공개 기준 말뭉치",
+  "sources": [
+    {
+      "id": "kdb_cancer_summary_2026",
+      "title": "KDB다이렉트 암보험 상품요약서",
+      "provider": "KDB생명",
+      "source_type": "product_summary",
+      "document_date": "2026",
+      "landing_url": "https://direct.kdblife.co.kr/",
+      "download_url": "https://direct.kdblife.co.kr/resources/doc/policy/40869_summary.pdf",
+      "access": "public_direct_download",
+      "local_filename": "kdb_cancer_summary_2026.pdf",
+      "sha256": "52e3470d7a04971e61eac4f8f685d41b8aa21b0d2a44a5bfc777ce5e6b1cb906",
+      "intended_use": ["coverage_vocabulary", "condition_phrase_evaluation"],
+      "redistribution": "not_assumed"
+    },
+    {
+      "id": "kdb_cancer_terms_2026",
+      "title": "KDB다이렉트 암보험 약관",
+      "provider": "KDB생명",
+      "source_type": "policy_terms",
+      "document_date": "2026",
+      "landing_url": "https://direct.kdblife.co.kr/",
+      "download_url": "https://direct.kdblife.co.kr/resources/doc/policy/40870_policy.pdf",
+      "access": "public_direct_download",
+      "local_filename": "kdb_cancer_terms_2026.pdf",
+      "sha256": "0bb88e7957e9b29d3e3f963dc44012f6255067c1e55da51cf395d24c5761b1ae",
+      "intended_use": ["coverage_vocabulary", "condition_phrase_evaluation"],
+      "redistribution": "not_assumed"
+    },
+    {
+      "id": "samsung_health_terms_2024",
+      "title": "삼성화재 건강보험 약관",
+      "provider": "삼성화재",
+      "source_type": "policy_terms",
+      "document_date": "2024-04-27",
+      "landing_url": "https://www.samsungfire.com/vh/page/VH.REIF0012.do",
+      "download_url": "https://www.samsungfire.com/publication/pdf/ZPB355051_0_20240427_file1.pdf",
+      "access": "public_direct_download",
+      "local_filename": "samsung_health_terms_2024.pdf",
+      "sha256": "f099dd388a9a8e462bfd787067bc4901606be3075410bc7ca621f6ac76bbf728",
+      "intended_use": ["coverage_vocabulary", "condition_phrase_evaluation"],
+      "redistribution": "not_assumed"
+    },
+    {
+      "id": "aihub_financial_document_ocr_632",
+      "title": "금융업 특화 문서 OCR 데이터",
+      "provider": "AI-Hub",
+      "source_type": "ocr_dataset",
+      "document_date": "2022",
+      "landing_url": "https://www.aihub.or.kr/aihubdata/data/view.do?aihubDataSe=realm&dataSetSn=632",
+      "access": "download_application_required",
+      "local_filename": null,
+      "sha256": null,
+      "intended_use": ["ocr_benchmark"],
+      "redistribution": "follow_aihub_terms"
+    },
+    {
+      "id": "aihub_public_document_ocr_88",
+      "title": "다양한 형태의 한글 문자 OCR",
+      "provider": "AI-Hub",
+      "source_type": "ocr_dataset",
+      "document_date": "2021",
+      "landing_url": "https://www.aihub.or.kr/aihubdata/data/view.do?dataSetSn=88",
+      "access": "download_application_required",
+      "local_filename": null,
+      "sha256": null,
+      "intended_use": ["ocr_benchmark"],
+      "redistribution": "follow_aihub_terms"
+    }
+  ]
+}

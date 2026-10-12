@@ -1,0 +1,15 @@
+alembic<2,>=1.16
+fastapi<1,>=0.116
+jinja2<4,>=3.1
+pydantic<3,>=2.11
+python-multipart<1,>=0.0.20
+sqlalchemy<3,>=2.0
+uvicorn[standard]<1,>=0.35
+
+[pdf]
+pymupdf<2,>=1.26
+
+[test]
+httpx<1,>=0.28
+pytest<10,>=8.4
+pytest-cov<8,>=6.2

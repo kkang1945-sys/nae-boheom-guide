@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ report.title }}</title>
+<style>
+main{max-width:960px;margin:auto;padding:32px 18px 70px}.hero{background:#5146ff!important;color:#fff!important;padding:36px!important}.hero h1,.hero p{color:#fff!important}.document{margin-top:18px}.benefit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.benefit{margin:0!important}.amount{font-size:1.25rem;font-weight:850;color:#5146ff}.source-label{display:inline-block;padding:5px 9px;border-radius:999px;background:#efefff;color:#5146ff;font-size:.8rem;font-weight:800}.actions{display:flex;gap:10px;flex-wrap:wrap}.actions a{display:inline-block;padding:12px 16px;border-radius:12px;background:#5146ff;color:#fff!important;font-weight:800}.description{white-space:pre-line}.muted{color:#707580}@media(max-width:700px){.benefit-grid{grid-template-columns:1fr}}
+</style>{% include '_theme.html' %}</head>
+<body><main>
+<nav><a href="/mock-analysis">← 모의계산</a> · <a href="/">보험증권 목록</a></nav>
+<section class="hero"><div class="eyebrow">증권 그대로 보기</div><h1>{{ report.title }}</h1><p>{{ report.description }}</p></section>
+<div class="actions"><a href="/benefits/admission">입원</a><a href="/benefits/outpatient">통원</a><a href="/benefits/surgery">수술</a></div>
+{% for group in report.groups %}<section class="document"><h2>{{ group.document_name|mask_document_name }}</h2><div class="benefit-grid">
+{% for item in group['items'] %}<article class="benefit"><span class="source-label">{{ item.source_status }}</span><h3>{{ item.name|mask_pii }}</h3><p>{{ item.plain_explanation }}</p>
+{% if item.amounts %}{% for amount in item.amounts %}<p class="amount">{% if item.amounts|length > 1 %}{{ amount.label|mask_pii }} · {% endif %}{{ amount.amount_won|korean_won }}</p>{% endfor %}{% else %}<p class="muted">금액은 증권의 상세 조건에서 확인할 수 있습니다.</p>{% endif %}
+{% if item.description %}<details><summary>증권에 적힌 지급조건</summary><p class="description">{{ item.description|mask_pii|readable_ocr }}</p></details>{% endif %}
+{% if not public_demo %}<p><a href="/documents/{{ group.document_id }}/pages/{{ item.page_number }}?coverage_id={{ item.coverage_id }}">{{ item.page_number }}쪽 원문 보기 →</a></p>{% endif %}</article>{% endfor %}
+</div><p><a href="/documents/{{ group.document_id }}">이 보험증권 자세히 보기 →</a></p></section>
+{% else %}<section><h2>증권에서 관련 보장을 찾지 못했습니다</h2><p>보장이 없다는 뜻이 아니라 현재 등록된 증권의 담보명과 보장내용에서 찾지 못한 결과입니다.</p></section>{% endfor %}
+<section><p class="muted">{% if public_demo %}개인정보 없는 합성 샘플로 보여주는 시연 화면입니다. {% endif %}화면의 금액과 조건은 보험증권에 적힌 내용을 읽기 쉽게 옮긴 것입니다. 실제 지급액은 사고 내용, 치료 형태와 약관 심사에 따라 달라질 수 있습니다.</p></section>
+</main></body></html>

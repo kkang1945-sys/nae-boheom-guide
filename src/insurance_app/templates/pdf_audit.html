@@ -1,0 +1,27 @@
+<article>
+  <h2>자동 검토와 검산</h2>
+  {% if audit %}
+  <p><strong>담보 {{ document.pdf_coverages|length }}개 중 {{ audit.checked }}개 표 읽기 검산 통과</strong></p>
+  <p>서로 다른 두 방식으로 이름·금액·기간·보장내용을 읽고 대조했습니다. 원 단위 금액, 기간 분리, 금액 칸 개수와 원문 위치도 검사합니다.</p>
+  {% if audit.summary_ready %}
+  <p class="status confirmed">자동 검산 통과 · 인식된 담보 표</p>
+  <p>담보마다 확인 버튼을 누르지 않아도 표 요약으로 진행할 수 있습니다.</p>
+  <p><a href="/documents/{{ document.id }}/summary">다음 단계: 검산한 담보 표 요약 →</a></p>
+  {% else %}<p class="status">진행 중 · 아래 불일치를 먼저 확인합니다.</p>{% endif %}
+  {% for issue in audit.issues %}<p>{{ issue }}</p>{% endfor %}
+  {% for row in document.pdf_coverages %}
+  {% set result = audit.rows.get(row.id|string) %}
+  {% if result and not result.passed %}<p><a href="/documents/{{ document.id }}/pages/{{ row.page_number }}?coverage_id={{ row.id }}">{{ row.page_number }}쪽 {{ row.row_number }}행</a>: {{ result.issues|join(' · ') }}</p>{% endif %}
+  {% endfor %}
+  <details><summary>검토 범위와 남은 조건</summary>
+  <p>{{ audit.scope }}</p>
+  <p>보험회사 표시, 표 밖 공통 조건, 면책·감액·복합 담보, 이미지 내용은 추가 검토가 필요합니다. 서로 다른 읽기 방식도 같은 오류를 낼 수 있어 정확도를 보장하지 않습니다.</p>
+  <p>이미지 또는 혼합 페이지: {{ audit.image_pages|join(', ') or '없음' }}. 로고만 있는 경우도 포함됩니다.</p>
+  {% set labels = {'renewal':'갱신 여부','contract_role':'주계약·특약','compensation_type':'보상 방식','payment_frequency':'지급 횟수'} %}
+  {% for key,count in audit.unresolved.items() %}<p>{{ labels[key] }} 미확인 {{ count }}개</p>{% endfor %}
+  <p>미확인 조건은 추측하지 않습니다. 다음 검토 단계에서 문서의 공통 조건과 함께 해석합니다. 지금 전부 직접 입력할 필요는 없습니다.</p>
+  </details>
+  {% else %}<p>현재 파일·추출값에 맞는 검산 기록이 없습니다. 검산 후 요약으로 진행합니다.</p>{% endif %}
+  <form method="post" action="/documents/{{ document.id }}/audit"><p><button>자동 검산 실행하고 다음 단계로</button></p></form>
+  <p class="source">이 PC에서 실행하는 문서 검산입니다. 외부 AI로 원본을 전송하지 않습니다. 자동 검산은 사용자 확인 이력과 별도로 보관합니다.</p>
+</article>

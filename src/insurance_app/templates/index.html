@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>내보험 사용설명서</title>
+    <style>
+      :root { color-scheme: light; font-family: system-ui, sans-serif; }
+      body { margin: 0; background: #f4f7fb; color: #172033; }
+      main { max-width: 720px; margin: 0 auto; padding: 56px 24px; }
+      section { background: white; border-radius: 20px; padding: 32px; box-shadow: 0 12px 36px #18284a12; }
+      h1 { margin-top: 0; font-size: clamp(28px, 6vw, 44px); }
+      p { line-height: 1.7; }
+      ul { padding-left: 22px; line-height: 1.8; }
+      .notice { padding: 16px; border-radius: 12px; background: #eef5ff; }
+      a.button { display: inline-block; padding: 12px 18px; border-radius: 10px; background: #175cd3; color: white; text-decoration: none; font-weight: 700; }
+      .document { margin-top: 20px; padding: 20px; border: 1px solid #dce3ef; border-radius: 14px; }
+      .home-intro{text-align:left;padding:56px 48px!important;background:linear-gradient(120deg,#fff 50%,#f0efff)!important;position:relative;overflow:hidden}.home-intro:after{content:"";position:absolute;width:230px;height:230px;border-radius:50%;right:-55px;top:-80px;background:#dedbff}.home-intro>*{position:relative;z-index:1}.home-intro h1{margin-bottom:12px}.home-intro p{max-width:590px;color:#716c83;font-size:1.08rem}.home-actions{display:grid;grid-template-columns:.9fr 1.1fr;gap:16px;margin-top:16px}.home-card{border:1px solid #e7e8ec;border-radius:22px;padding:28px;background:#fff}.home-card h2{margin-top:0}.history{grid-column:auto}.document{background:#f5f6f8!important;border:0!important;box-shadow:none!important;margin-top:12px!important}.document p{margin:7px 0}.document .meta{color:#868b95;font-size:.9rem}
+      .upload { margin: 20px 0 0; padding: 28px 20px; border: 1.5px dashed #c7c9d1; border-radius: 18px; background:#fafafa;text-align:center }
+      .upload input { display: block; margin: 12px 0; }
+      button { padding: 12px 18px; border: 0; border-radius: 10px; background: #175cd3; color: white; font-weight: 700; cursor: pointer; }
+      @media (max-width: 520px) {
+        main { padding: 20px 14px; }.home-actions{grid-template-columns:1fr}.history{grid-column:auto}.home-intro{padding:36px 24px!important}.home-intro:after{opacity:.45}
+        section { padding: 24px 20px; border-radius: 16px; }
+        h1 { line-height: 1.2; }
+        p, li { font-size: 17px; }
+      }
+    </style>
+  {% include '_theme.html' %}</head>
+  <body>
+    <main>
+      <section class="home-intro">
+        <h1>내보험 사용설명서</h1>
+        <p>보험증권을 올리면 어려운 보장은 쉽게 풀고, 내 생활을 얼마나 지킬 수 있는지 한눈에 설명합니다.</p>
+        {% if message %}<p class="notice">{{ message }}</p>{% endif %}
+        {% if public_demo %}<p class="notice"><strong>공개 시연판</strong> · 실제 개인정보나 보험증권은 받지 않습니다. 아래 합성 샘플로 기능을 체험해 보세요.</p>{% endif %}
+      </section>
+      <div class="home-actions">
+        <section class="home-card">
+          <span class="chip">시작하기</span>
+          {% if public_demo %}
+          <h2 style="margin-top:14px">샘플 보험으로 체험하기</h2>
+          <p class="muted">샘플 보험증권 2개가 준비되어 있습니다. 생활비 기준 보장 범위를 바로 계산해 보세요.</p>
+          <p><a class="button" href="/documents/combined">샘플 보험증권 불러오기 →</a></p>
+          {% else %}
+          <h2 style="margin-top:14px">보험증권 추가</h2>
+          <p class="muted">PDF 또는 HWP 증권을 등록해 내 보험 사용설명서를 만드세요.</p>
+          <form class="upload" method="post" action="/documents" enctype="multipart/form-data" novalidate>
+            <label for="insurance-file"><strong>PDF 또는 HWP 파일 선택</strong></label>
+            <input id="insurance-file" type="file" name="file" accept=".hwp,.xml,.pdf" multiple required>
+            <p id="upload-status" class="muted" role="status" aria-live="polite">보험증권을 여러 개 선택할 수 있습니다.</p>
+            <button type="submit" style="width:100%">보험증권 읽어보기 →</button>
+          </form>
+          {% endif %}
+        </section>
+        <section class="home-card history">
+          <span class="chip">이어보기</span>
+          <h2 style="margin-top:14px">기존 점검내역 불러오기</h2>
+        {% if documents %}
+          {% if documents|length > 1 %}<p><a class="button" href="/documents/combined">보험증권 {{ documents|length }}개 함께 보기 →</a></p>{% endif %}
+          {% for document in documents %}
+            <div class="document">
+              <strong>{{ document.source_name|mask_document_name }}</strong>
+              {% if document.confirmed_insurer or document.insurer_candidate or document.confirmed_product or document.product_candidate %}
+              <p class="meta">증권에서 읽은 정보 · {{ document.confirmed_insurer or document.insurer_candidate or "보험회사 표기 없음" }}{% if document.confirmed_product or document.product_candidate %} · {{ (document.confirmed_product or document.product_candidate)|mask_pii }}{% endif %}</p>
+              {% endif %}
+              {% set rows = document.pdf_coverages if document.format == 'pdf' else document.coverages %}
+              {% if document.subject %}<p class="meta">분석 대상자 · {{ document.subject.label }}</p>{% endif %}
+              <p class="meta">{{ document.format|upper }} · 추출된 담보 후보 {{ rows|length }}개 · 확인 완료 {{ rows|selectattr('review_status','equalto','confirmed')|list|length }}개</p>
+              <a class="button" href="/documents/{{ document.id }}">점검내역 열기</a>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="notice">등록된 보험증권이 없습니다.</p>
+        {% endif %}
+        </section>
+      </div>
+    </main>
+    {% if not public_demo %}<script>
+      const uploadForm = document.querySelector('.upload');
+      const fileInput = document.querySelector('#insurance-file');
+      const uploadStatus = document.querySelector('#upload-status');
+      const uploadButton = uploadForm.querySelector('button[type="submit"]');
+
+      fileInput.addEventListener('change', () => {
+        uploadStatus.textContent = fileInput.files.length
+          ? `${fileInput.files.length}개 파일 선택됨 · ${Array.from(fileInput.files, file => file.name).join(', ')}`
+          : '보험증권을 여러 개 선택할 수 있습니다.';
+      });
+
+      uploadForm.addEventListener('submit', (event) => {
+        if (!fileInput.files.length) {
+          event.preventDefault();
+          uploadStatus.textContent = '먼저 보험증권 파일을 선택해 주세요.';
+          fileInput.focus();
+          return;
+        }
+        uploadButton.disabled = true;
+        uploadButton.textContent = '보험증권을 읽는 중입니다…';
+        uploadStatus.textContent = '파일 크기와 페이지 수에 따라 잠시 걸릴 수 있습니다. 이 화면을 닫지 말아 주세요.';
+      });
+    </script>{% endif %}
+  </body>
+</html>

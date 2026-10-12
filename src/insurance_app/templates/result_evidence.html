@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>결과 근거</title>
+  <style>body{font-family:system-ui,sans-serif;background:#f4f7fb;color:#172033;margin:0}main{max-width:900px;margin:auto;padding:28px 16px}section{background:white;padding:24px;border-radius:16px;margin-bottom:18px}p,li{line-height:1.7}.notice{background:#eef5ff;padding:14px;border-radius:10px}.empty,.caveat{color:#704d00}a{color:#175cd3}.program{border-top:1px solid #e2e8f0;padding-top:12px;margin-top:12px}.program:first-of-type{border-top:0}</style>
+{% include '_theme.html' %}</head>
+<body><main>
+  <p><a href="/results?subject_id={{ subject.id }}">← 현재 결과</a></p>
+  <section><h1>{{ subject.label|mask_subject_label }} 결과 근거</h1><p class="notice">{{ evidence.scope }}</p></section>
+  <section><h2>{{ evidence.subject_context.stage_label }} 분석 기준</h2><p>{{ evidence.subject_context.sex_focus }}{% if evidence.subject_context.pregnancy_focus %} · 임신·출산 관련 담보와 공적제도 확인{% endif %}</p><ul>{% for item in evidence.subject_context.focus %}<li>{{ item }}</li>{% endfor %}</ul>{% if evidence.subject_context.age_note %}<small>{{ evidence.subject_context.age_note }}</small>{% endif %}</section>
+  <section><h2>사용자 입력</h2><ul>{% for item in evidence.inputs %}<li>{{ item.label }}: {% if item.value is none %}<span class="empty">입력 없음</span>{% else %}{{ item.value|korean_won if item.key.endswith('_won') else item.value }}{% endif %}</li>{% endfor %}</ul></section>
+  <section><h2>계산식</h2><ul>{% for formula in evidence.formulae %}<li>{{ formula }}</li>{% endfor %}</ul></section>
+  <section><h2>원문 대조 확정 담보</h2>{% for scenario in evidence.scenarios %}<h3>{{ scenario.standard_name }}</h3>{% if scenario['items'] %}<ul>{% for item in scenario['items'] %}<li><a href="/documents/{{ item.document_id }}/pages/{{ item.page_number }}">{{ item.document_name|mask_document_name }} · {{ item.coverage_name|mask_pii }}</a></li>{% endfor %}</ul>{% else %}<p class="empty">{{ scenario.reason or '확정 담보가 없습니다.' }}</p>{% endif %}{% else %}<p class="empty">계산에 쓸 확정 담보가 없습니다.</p>{% endfor %}</section>
+  <section><h2>생애단계별 공적제도 확인</h2><p class="notice">{{ evidence.public_evidence_scope }}</p>{% for program in evidence.public_programs %}<article class="program"><h3>{{ program.title }}</h3><p>{{ program.summary }}</p><p><strong>{{ program.relevance }}:</strong> {{ program.review_reason }}</p><p class="caveat">확인할 점: {{ program.caveat }}</p><p><a href="{{ program.url }}" target="_blank" rel="noreferrer noopener">{{ program.source_title }} ↗</a><br><small>{{ program.institution }} · 확인일 {{ program.verified_on }}</small></p></article>{% endfor %}</section>
+  <section><h2>계산에서 제외한 문서</h2>{% for item in evidence.blocked_documents %}<p><a href="/documents/{{ item.document_id }}/preflight">{{ item.document_name|mask_document_name }}</a>: {{ item.reason|mask_pii }}</p>{% else %}<p>제외한 문서가 없습니다.</p>{% endfor %}</section>
+</main></body></html>

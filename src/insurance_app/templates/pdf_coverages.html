@@ -1,0 +1,33 @@
+{% set enum_fields = [
+ ('renewal','갱신 여부',[('unknown','미확인'),('renewable','갱신형'),('nonrenewable','비갱신형')]),
+ ('contract_role','주계약·특약',[('unknown','미확인'),('main','주계약'),('rider','특약')]),
+ ('compensation_type','보상 방식',[('unknown','미확인'),('fixed','정액형'),('actual_cost','실손형')]),
+ ('payment_frequency','지급 횟수',[('unknown','미확인'),('once','최초·한 번'),('per_event','사고·사유별'),('per_day','일별'),('repeat','반복 지급')])
+] %}
+{% for coverage in document.pdf_coverages %}
+{% set raw = coverage.extracted_fields %}{% set values = coverage.confirmed_fields or raw %}
+<article id="pdf-coverage-{{ coverage.id }}">
+  <span class="status {% if coverage.review_status == 'confirmed' %}confirmed{% endif %}">{% if coverage.review_status == 'confirmed' %}입력 확인 완료 · 분석 전 검산 필요{% elif audit and audit.rows.get(coverage.id|string, {}).get('passed') %}자동 검산 통과 · 표 읽기{% else %}검산 확인 필요{% endif %}</span>
+  <h2>{{ loop.index }}. {{ values.name|mask_pii }}</h2>
+  <p class="amount-readable">{{ values.amount_won|korean_won }}</p>
+  <p>보험기간: {{ values.insurance_period or '미확인' }} · 납입기간: {{ values.payment_period or '미확인' }}</p>
+  <p><a href="/documents/{{ document.id }}/pages/{{ coverage.page_number }}?coverage_id={{ coverage.id }}">{{ coverage.page_number }}쪽 {{ coverage.row_number }}행 원문 대조 →</a></p>
+  <div class="explanation"><strong>증권에 적힌 보장내용</strong>{{ raw.description|mask_pii|readable_ocr }}</div>
+  <p class="source">원문 금액: {{ raw.amount_text|mask_pii }} · 원문 납기·만기: {{ raw.raw_period|mask_pii }}. 공통 조건·면책·감액은 원문 다른 페이지와 약관도 함께 확인해야 합니다.</p>
+  <form method="post" action="/documents/{{ document.id }}/pdf-coverages/{{ coverage.id }}/review">
+    <details class="edit"><summary>추출값 확인·수정</summary>
+      <div class="grid">
+      <label>담보명<input name="name" value="{{ values.name }}" required></label>
+      <label>가입금액(원)<input type="number" name="amount_won" min="0" max="9000000000000000" step="1" value="{{ values.amount_won if values.amount_won is not none else '' }}" required></label>
+      <label>보험기간<input name="insurance_period" value="{{ values.insurance_period }}" required></label>
+      <label>납입기간<input name="payment_period" value="{{ values.payment_period }}" required></label>
+      {% for key,label,options in enum_fields %}<label>{{ label }}<select name="{{ key }}" style="padding:11px;font:inherit;border:1px solid #b8c2d1;border-radius:9px;">{% for value,text in options %}<option value="{{ value }}" {% if values[key] == value %}selected{% endif %}>{{ text }}</option>{% endfor %}</select></label>{% endfor %}
+      </div>
+      <p>모르는 항목은 미확인으로 남겨 주세요. 미확인 항목이 남으면 입력 확인 완료로 표시하지 않습니다.</p>
+      <label style="display:block;font-weight:400"><input type="checkbox" name="source_checked" value="yes" style="width:auto" required> 저장할 내용을 원문과 대조했습니다.</label>
+      <p><button type="submit">확인한 내용 저장</button></p>
+    </details>
+  </form>
+  {% if coverage.revisions %}<details class="edit"><summary>수정·확인 이력 {{ coverage.revisions|length }}건</summary>{% for revision in coverage.revisions %}<p>{{ revision.created_at }} · {{ revision.after.name|mask_pii }} · {{ revision.after.amount_won|korean_won }} · 보험기간 {{ revision.after.insurance_period|mask_pii }} · 납입기간 {{ revision.after.payment_period|mask_pii }}</p>{% endfor %}</details>{% endif %}
+</article>
+{% endfor %}

@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: insurance-gap-app
+Version: 0.1.0
+Summary: 로컬 우선 개인 보험 분석 앱
+Requires-Python: <3.13,>=3.12
+Requires-Dist: alembic<2,>=1.16
+Requires-Dist: fastapi<1,>=0.116
+Requires-Dist: jinja2<4,>=3.1
+Requires-Dist: pydantic<3,>=2.11
+Requires-Dist: python-multipart<1,>=0.0.20
+Requires-Dist: sqlalchemy<3,>=2.0
+Requires-Dist: uvicorn[standard]<1,>=0.35
+Provides-Extra: pdf
+Requires-Dist: pymupdf<2,>=1.26; extra == "pdf"
+Provides-Extra: test
+Requires-Dist: httpx<1,>=0.28; extra == "test"
+Requires-Dist: pytest<10,>=8.4; extra == "test"
+Requires-Dist: pytest-cov<8,>=6.2; extra == "test"

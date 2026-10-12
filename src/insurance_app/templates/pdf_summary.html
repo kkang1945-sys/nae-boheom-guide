@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>검산한 담보 표 요약</title>
+<style>body{font-family:system-ui,sans-serif;background:#f4f7fb;color:#172033;margin:0}main{max-width:1100px;margin:auto;padding:28px 16px}article,header{background:white;padding:24px;border-radius:16px;margin-bottom:20px}a{color:#175cd3}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #ddd}th{white-space:nowrap}p{line-height:1.7}.scroll{overflow-x:auto}small{display:block;color:#5b6576}</style>{% include '_theme.html' %}</head>
+<body><main><p><a href="/documents/{{ document.id }}">← 검토 상세</a></p>
+{% set contract_summary = document.pdf_coverages and document.pdf_coverages[0].extracted_fields.get('source_record_type') == 'contract_summary' %}
+<header><h1>{{ '검산한 가입특약 요약' if contract_summary else '검산한 보장내역 요약' }}</h1><p>{{ document.source_name|mask_document_name }} · {{ audit.checked }}개 항목의 원문 읽기 검산 통과</p>
+{% if contract_summary %}<p>가입특약 조회의 항목명·가입금액·납입기간·보험기간을 정리했습니다. 이 가입금액은 특약의 계약 요약값이며, 상세 지급조건이나 실제 받을 보험금으로 해석하지 않습니다.</p>
+{% else %}<p>원문 보장내역의 이름·보장금액·보장내용을 같은 구역에서 연결했습니다. 전체 약관의 해석이나 실제 보험금 지급 가능성을 확정한 것은 아닙니다.</p>{% endif %}
+<p><strong>다음 절차: 공통 조건·지급 조건 검토</strong><br>갱신 여부, 지급 횟수, 실손·정액 구분, 면책·감액과 복합 담보를 정리해야 합니다. 현재는 자금공백 분석을 진행하지 않습니다.</p>
+<p><a href="/documents/{{ document.id }}/conditions">지급 조건·면책 등 원문 근거 보기 →</a></p>
+<p><a href="/documents/{{ document.id }}/classification">담보 종류별 보기 →</a></p>
+<p>{% if not document.insurer_candidate %}보험회사 이름은 원문 확인이 남아 있습니다. {% endif %}같은 계약을 다른 파일 형식으로 올려도 별개 보험으로 합산하면 안 됩니다.</p></header>
+<article><h2>원문에서 검산한 값</h2><div class="scroll"><table><thead><tr><th>{{ '계약 항목' if contract_summary else '보장 항목' }}</th><th>{{ '가입금액' if contract_summary else '보장금액' }}</th><th>납입기간</th><th>보험기간</th><th>근거</th></tr></thead><tbody>
+{% for row in document.pdf_coverages %}{% set v = row.extracted_fields %}
+<tr><td>{{ v.name|mask_pii }}{% if row.confirmed_fields %}<small>별도 사용자 수정값 있음 · 검토 상세 참조</small>{% endif %}</td><td>{{ v.amount_won|korean_won }}</td><td>{{ v.payment_period|mask_pii }}</td><td>{{ v.insurance_period|mask_pii }}</td><td><a href="/documents/{{ document.id }}/pages/{{ row.page_number }}?coverage_id={{ row.id }}">{{ row.page_number }}쪽 {{ row.row_number }}행</a></td></tr>
+{% endfor %}</tbody></table></div><p>조건이 다른 담보를 합산한 총액은 표시하지 않습니다. 사용자 수정값을 자동 검산값으로 바꾸어 표시하지 않습니다.</p></article>
+</main></body></html>

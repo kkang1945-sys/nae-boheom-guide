@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>담보 통합 준비 현황</title>
+<style>body{font-family:system-ui,sans-serif;background:#f4f7fb;color:#172033;margin:0}main{max-width:1000px;margin:auto;padding:28px 16px}header,section{background:white;border-radius:16px;padding:24px;margin-bottom:20px}a{color:#175cd3}p{line-height:1.7}.item{padding:14px 0;border-bottom:1px solid #ddd}.ok{background:#ecfdf3;color:#166534;padding:12px;border-radius:10px}.warn{background:#fff4d6;color:#704d00;padding:12px;border-radius:10px}small{display:block;color:#5b6576}ul{margin:8px 0;padding-left:20px}</style>{% include '_theme.html' %}</head>
+<body><main><a href="/documents/{{ document.id }}/classification">← 담보 종류별 보기</a>
+<header><h1>담보 통합 준비 현황</h1><p>{{ document.source_name|mask_document_name }}</p><p>{{ report.scope }}</p>
+{% if report.possible_duplicate %}<p class="warn">같은 계약의 다른 파일일 가능성이 있어, 이 문서의 담보를 다른 파일과 합산하지 않습니다.</p>{% endif %}</header>
+<section><h2>통합 후보 {{ report.eligible|length }}개</h2>
+{% if report.eligible %}{% for item in report.eligible %}<div class="item"><strong>{{ item.standard_name }}</strong> · {{ item.name|mask_pii }}<small><a href="/documents/{{ document.id }}/pages/{{ item.page_number }}?coverage_id={{ item.id }}">원문 {{ item.page_number }}쪽 {{ item.row_number }}행</a></small></div>{% endfor %}
+{% else %}<p class="ok">현재 확인된 값만으로 통합할 수 있는 담보가 없습니다. 이것은 보장이 없다는 뜻이 아닙니다.</p>{% endif %}</section>
+<section><h2>확인 후 통합 검토 {{ report.blocked|length }}개</h2>
+{% for item in report.blocked %}<div class="item"><strong>{{ item.standard_name }}</strong> · {{ item.name|mask_pii }}<ul>{% for reason in item.reasons %}<li>{{ reason|mask_pii }}</li>{% endfor %}</ul><small><a href="/documents/{{ document.id }}#pdf-coverage-{{ item.id }}">원문 대조·수정으로 이동</a></small></div>{% else %}<p>없음</p>{% endfor %}</section>
+<section><h2>표준 15개 군 밖 담보 {{ report.outside_standard|length }}개</h2><p>자동차·법률·골절 등은 이 통합 화면의 대상이 아니며, 보장을 따로 설명합니다.</p></section>
+<small>통합 준비 규칙: {{ report.version }}</small></main></body></html>

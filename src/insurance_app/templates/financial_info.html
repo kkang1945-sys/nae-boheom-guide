@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>경제정보 입력</title>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f4f7fb;color:#172033;margin:0}
+    main{max-width:900px;margin:auto;padding:28px 16px}
+    section,article{background:white;padding:24px;border-radius:16px;margin-bottom:18px}
+    fieldset{border:1px solid #d7dfeb;border-radius:12px;margin:18px 0;padding:16px}
+    legend{font-weight:800;padding:0 8px}
+    label{display:block;font-weight:700;margin-top:12px}
+    input{box-sizing:border-box;width:100%;max-width:420px;padding:10px;margin-top:5px}
+    button{margin-top:18px;padding:12px 18px;border:0;border-radius:10px;background:#175cd3;color:white;font-weight:700}
+    .notice{background:#eef5ff;padding:14px;border-radius:10px}
+    .stage{background:#fff8e8;padding:14px;border-radius:10px}
+    p{line-height:1.7}
+    small{display:block;color:#5b6576;line-height:1.6}
+  </style>
+{% include '_theme.html' %}</head>
+<body><main>
+  <p><a href="/">← 보험증권 목록</a> · <a href="/subjects">분석 대상자 설정</a> · <a href="/mock-analysis">저장하지 않는 모의계산</a></p>
+  <section>
+    <h1>경제정보 입력</h1>
+    <p>다른 사람의 평균이나 보험 권장금액을 쓰지 않습니다. 입력한 생활비·소득공백·자산 범위로만 이후 자금공백을 계산합니다. 빈칸은 0원이 아니라 ‘정보 없음’이며 판단을 보류할 수 있습니다.</p>
+    {% if message %}<p class="notice">{{ message }}</p>{% endif %}
+  </section>
+  {% for subject in subjects %}
+    {% set profile = subject.financial_profile %}
+    <article>
+      <h2>{{ subject.label|mask_subject_label }}</h2>
+      {% if readiness[subject.id].income_gap_ready %}
+        <p class="notice">{{ readiness[subject.id].basis }} 기준 입력이 준비되었습니다. 보험 정보 검산이 끝나야 계산합니다.</p>
+      {% else %}
+        <p class="notice">판단 보류: {{ readiness[subject.id].missing|join(', ') }} 입력이 필요합니다.</p>
+      {% endif %}
+      <form method="post" action="/subjects/{{ subject.id }}/financial-profile">
+        <fieldset>
+          <legend>공통 시나리오</legend>
+          <label>소득·생활 중단 대비기간(개월)<input type="number" min="0" max="600" name="income_gap_months" value="{{ profile.income_gap_months if profile and profile.income_gap_months is not none else '' }}"></label>
+          <label>사용 가능한 비상자금(원)<input type="number" min="0" name="emergency_fund_available_won" value="{{ profile.emergency_fund_available_won if profile and profile.emergency_fund_available_won is not none else '' }}"></label>
+          <label>분석에 사용할 비상자금(원)<input type="number" min="0" name="emergency_fund_to_use_won" value="{{ profile.emergency_fund_to_use_won if profile and profile.emergency_fund_to_use_won is not none else '' }}"></label>
+        </fieldset>
+
+        {% if subject.life_stage == 'child' %}
+          <fieldset>
+            <legend>아동·청소년 분석 입력</legend>
+            <p class="stage">아이 본인의 소득을 가정하지 않습니다. 보호자의 실제 월 소득 감소와 아이 때문에 추가되는 월 돌봄비를 입력합니다.</p>
+            <label>보호자 월 소득 감소액(원)<input type="number" min="0" name="guardian_monthly_income_loss_won" value="{{ profile.guardian_monthly_income_loss_won if profile and profile.guardian_monthly_income_loss_won is not none else '' }}"></label>
+            <label>아동 월 추가 돌봄비(원)<input type="number" min="0" name="child_monthly_care_cost_won" value="{{ profile.child_monthly_care_cost_won if profile and profile.child_monthly_care_cost_won is not none else '' }}"></label>
+            <label>유급휴가·회사 지원 총액(원)<input type="number" min="0" name="paid_leave_support_won" value="{{ profile.paid_leave_support_won if profile and profile.paid_leave_support_won is not none else '' }}"></label>
+          </fieldset>
+        {% elif subject.life_stage == 'retired_older_adult' %}
+          <fieldset>
+            <legend>노년·은퇴기 분석 입력</legend>
+            <p class="stage">근로소득을 가정하지 않습니다. 실제 생활비와 의료·돌봄 본인부담, 이 시나리오에 사용할 연금·지속소득을 구분해 입력합니다.</p>
+            <label>월 필수생활비(원)<input type="number" min="0" name="monthly_essential_expenses_won" value="{{ profile.monthly_essential_expenses_won if profile and profile.monthly_essential_expenses_won is not none else '' }}"></label>
+            <label>분석에 사용할 월 연금·지속소득(원)<input type="number" min="0" name="retirement_monthly_income_to_use_won" value="{{ profile.retirement_monthly_income_to_use_won if profile and profile.retirement_monthly_income_to_use_won is not none else '' }}"></label>
+            <label>월 의료·돌봄 본인부담(원)<input type="number" min="0" name="retirement_monthly_care_cost_won" value="{{ profile.retirement_monthly_care_cost_won if profile and profile.retirement_monthly_care_cost_won is not none else '' }}"></label>
+          </fieldset>
+        {% else %}
+          <fieldset>
+            <legend>경제활동·일반 생활자금 입력</legend>
+            <label>월 필수생활비(원)<input type="number" min="0" name="monthly_essential_expenses_won" value="{{ profile.monthly_essential_expenses_won if profile and profile.monthly_essential_expenses_won is not none else '' }}"></label>
+            <label>월 세후소득(원)<input type="number" min="0" name="monthly_net_income_won" value="{{ profile.monthly_net_income_won if profile and profile.monthly_net_income_won is not none else '' }}"></label>
+            <label>유급휴가·회사 지원 총액(원)<input type="number" min="0" name="paid_leave_support_won" value="{{ profile.paid_leave_support_won if profile and profile.paid_leave_support_won is not none else '' }}"></label>
+          </fieldset>
+        {% endif %}
+
+        <fieldset>
+          <legend>사망·가족생활 시나리오</legend>
+          <label>대출잔액(원)<input type="number" min="0" name="loan_balance_won" value="{{ profile.loan_balance_won if profile and profile.loan_balance_won is not none else '' }}"></label>
+          <label>부양가족 수<input type="number" min="0" max="100" name="dependent_count" value="{{ profile.dependent_count if profile and profile.dependent_count is not none else '' }}"></label>
+          <label>가족 월 필수생활비(원)<input type="number" min="0" name="family_monthly_expenses_won" value="{{ profile.family_monthly_expenses_won if profile and profile.family_monthly_expenses_won is not none else '' }}"></label>
+          <label>사망 후 가족생활비를 준비할 기간(개월)<input type="number" min="0" max="600" name="family_support_months" value="{{ profile.family_support_months if profile and profile.family_support_months is not none else '' }}"></label>
+          <small>입원기간이 아닙니다. 사망 후 남은 가족이 현재 생활비를 유지해야 한다고 보는 기간이며, 앱이 평균값을 자동 지정하지 않습니다.</small>
+          <label>가족 대비에 사용할 금융자산(원)<input type="number" min="0" name="liquid_assets_to_use_won" value="{{ profile.liquid_assets_to_use_won if profile and profile.liquid_assets_to_use_won is not none else '' }}"></label>
+        </fieldset>
+        <small>0은 실제로 사용할 금액이나 추가 비용이 없다고 확인한 경우에만 입력하세요. 공적제도 지원금은 여기서 자동 추정하거나 차감하지 않습니다.</small>
+        <button>경제정보 저장</button>
+      </form>
+    </article>
+  {% else %}
+    <section><p class="notice">먼저 분석 대상자를 등록해 주세요. 실제 이름은 입력할 필요가 없습니다.</p></section>
+  {% endfor %}
+</main></body>
+</html>

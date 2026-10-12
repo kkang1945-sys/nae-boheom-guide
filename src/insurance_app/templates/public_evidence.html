@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>공적제도 근거</title>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f4f7fb;color:#172033;margin:0}
+    main{max-width:900px;margin:auto;padding:28px 16px}
+    section,article{background:#fff;padding:24px;border-radius:16px;margin-bottom:18px}
+    p{line-height:1.7}.notice{background:#eef5ff;padding:14px;border-radius:10px}.caveat{color:#704d00}
+    a{color:#175cd3}small{color:#526172}
+  </style>
+{% include '_theme.html' %}</head>
+<body><main>
+  <p><a href="/">← 처음으로</a></p>
+  <section><h1>공적제도 확인 자료</h1><p class="notice">{{ scope }}</p><p>정부·공공기관 자료 중 현재 연결한 공식 페이지입니다. 금액과 적용 기준은 바뀔 수 있어 앱에 고정하지 않습니다. 현재 기준과 본인 적용 여부를 직접 확인해 주세요.</p></section>
+  {% for program in programs %}<article><h2>{{ program.title }}</h2><p>{{ program.summary }}</p><p class="caveat">확인할 점: {{ program.caveat }}</p><p><a href="{{ program.url }}" target="_blank" rel="noreferrer noopener">{{ program.source_title }} ↗</a><br><small>{{ program.institution }} · 확인일 {{ program.verified_on }}</small></p></article>{% endfor %}
+</main></body></html>

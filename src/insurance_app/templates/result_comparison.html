@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>저장 결과 비교</title>
+<style>body{font-family:system-ui,sans-serif;background:#f4f7fb;color:#172033;margin:0}main{max-width:900px;margin:auto;padding:28px 16px}section,article{background:white;padding:24px;border-radius:16px;margin-bottom:18px}p,th,td{line-height:1.7}table{width:100%;border-collapse:collapse}th,td{padding:10px;text-align:left;border-bottom:1px solid #dde3ed}.notice{background:#eef5ff;padding:14px;border-radius:10px}a{color:#175cd3}@media(max-width:640px){main{padding:16px 10px}section{padding:18px 14px}table{display:block;overflow-x:auto;white-space:nowrap}}</style>
+{% include '_theme.html' %}</head>
+<body><main>
+<p><a href="/results/snapshots/{{ snapshot.id }}">← 저장 당시 결과</a> · <a href="/results?subject_id={{ subject.id }}">현재 결과</a></p>
+<section><h1>저장 결과와 현재 결과 비교</h1><p class="notice">{{ comparison.scope }}</p><p>대상자: {{ subject.label|mask_subject_label }} · 저장 기록 #{{ snapshot.id }}</p></section>
+<section><table><thead><tr><th>위험</th><th>저장 당시</th><th>현재</th><th>공백 변화</th></tr></thead><tbody>
+{% for row in comparison.rows %}<tr><td>{{ row.standard_name }}</td><td>{{ status_labels.get(row.saved_status, row.saved_status) }}{% if row.saved_gap_won is not none %} · {{ row.saved_gap_won|korean_won }}{% endif %}</td><td>{{ status_labels.get(row.current_status, row.current_status) }}{% if row.current_gap_won is not none %} · {{ row.current_gap_won|korean_won }}{% endif %}</td><td>{% if row.gap_change_won is not none %}{{ row.gap_change_won|korean_won }}{% else %}비교할 금액 없음{% endif %}</td></tr>{% else %}<tr><td colspan="4">저장 당시와 현재 모두 계산 가능한 위험별 결과가 없습니다.</td></tr>{% endfor %}
+</tbody></table></section></main></body></html>
